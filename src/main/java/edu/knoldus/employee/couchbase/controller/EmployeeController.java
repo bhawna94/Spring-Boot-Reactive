@@ -1,6 +1,7 @@
 package edu.knoldus.employee.couchbase.controller;
 
 import edu.knoldus.employee.couchbase.model.Employee;
+import edu.knoldus.employee.couchbase.model.ExternalService;
 import edu.knoldus.employee.couchbase.service.EmployeeCouchbaseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,5 +34,10 @@ public class EmployeeController {
     @PostMapping("employee/update")
     public Employee addEmployee(@RequestBody Employee employee) {
           return employeeCouchbaseService.addEmployee(employee);
+    }
+
+    @GetMapping("external/service/invoke")
+    public ExternalService callToExternalService() {
+        return employeeCouchbaseService.callToExternalservice();
     }
 }
