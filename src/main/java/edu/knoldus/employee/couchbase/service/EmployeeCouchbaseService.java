@@ -1,11 +1,15 @@
 package edu.knoldus.employee.couchbase.service;
 
 import edu.knoldus.employee.couchbase.model.Employee;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.concurrent.CompletableFuture;
 
 public interface EmployeeCouchbaseService {
 
     Employee getEmployeeById(String employeeId);
 
-    Employee getEmployeeByIdAndName(String id, String name);
+    CompletableFuture<Employee> getEmployeeByIdAndName(String id, String name);
+
+    Employee addEmployee(Employee employee);
+
 }

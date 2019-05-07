@@ -27,18 +27,24 @@ public class CustomisedEmployeeRepositoryImpl  implements CustomisedEmployeeRepo
         JsonObject placeholder = JsonObject.create()
                 .put("empId", id)
                 .put("empName", name);
-
+        System.out.println(bucket.name());
         N1qlQuery n1qlQuery = N1qlQuery.parameterized(query, placeholder);
 
        Observable<JsonObject> row =  bucket.async()
                 .query(n1qlQuery)
-                .flatMap(queryResult -> queryResult.errors()
-                        .flatMap(error ->
+                .flatMap(queryResult -> {
+                    System.out.println(queryResult.rows() + "chhc" +  queryResult.errors());
+                    return queryResult.errors()
 
-                                Observable
-                                        .<JsonObject>error(new CouchbaseException(error.toString()))
-                        )
-                        .switchIfEmpty(queryResult.rows().map(AsyncN1qlQueryRow::value))
+                                    .flatMap(error -> {
+                                                System.out.println(error + "Error");
+
+                                                return   Observable
+                                                        .<JsonObject>error(new CouchbaseException(error.toString()));
+                                            }
+                                    )
+                                    .switchIfEmpty(queryResult.rows().map(AsyncN1qlQueryRow::value));
+                        }
                 ).singleOrDefault(JsonObject.empty());
 
         return toCompletableFuture(row).thenApply(this::mapToEmployee);
@@ -52,6 +58,7 @@ public class CustomisedEmployeeRepositoryImpl  implements CustomisedEmployeeRepo
 
     private Employee mapToEmployee(JsonObject jsonObject) {
 
+        System.out.println(jsonObject + "jsonObject");
         Employee emp = Employee.builder().build();
 
         try {
