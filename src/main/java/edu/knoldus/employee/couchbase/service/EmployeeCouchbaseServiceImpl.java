@@ -2,12 +2,13 @@ package edu.knoldus.employee.couchbase.service;
 
 import edu.knoldus.employee.couchbase.exceptions.EmployeeNotFoundById;
 import edu.knoldus.employee.couchbase.model.Employee;
-import edu.knoldus.employee.couchbase.model.ExternalService;
+import edu.knoldus.employee.couchbase.model.UserDetails;
 import edu.knoldus.employee.couchbase.repository.EmployeeRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -16,8 +17,11 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
 
     private EmployeeRepository employeeRepository;
 
-    public EmployeeCouchbaseServiceImpl(EmployeeRepository employeeRepository) {
+    private final WebClient webClient;
+
+    public EmployeeCouchbaseServiceImpl(EmployeeRepository employeeRepository, WebClient.Builder webClientBuilder ) {
         this.employeeRepository = employeeRepository;
+        this.webClient = webClientBuilder.baseUrl("https://jsonplaceholder.typicode.com").build();
     }
 
     @Override
@@ -52,12 +56,8 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
     }
 
     @Override
-    public ExternalService callToExternalservice() {
+    public Mono<UserDetails> callToExternalservice() {
+     return this.webClient.get().uri("posts/1").retrieve().bodyToMono(UserDetails.class);
 
-        RestTemplate restTemplate = new RestTemplate();
-        System.out.println("?>?>?>?>?>?>?>");
-        ExternalService es = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", ExternalService.class);
-        System.out.println(">>>>>>>>>>>>>" + es);
-        return es;
     }
 }

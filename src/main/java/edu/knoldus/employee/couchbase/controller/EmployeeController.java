@@ -1,13 +1,14 @@
 package edu.knoldus.employee.couchbase.controller;
 
 import edu.knoldus.employee.couchbase.model.Employee;
-import edu.knoldus.employee.couchbase.model.ExternalService;
+import edu.knoldus.employee.couchbase.model.UserDetails;
 import edu.knoldus.employee.couchbase.service.EmployeeCouchbaseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -37,7 +38,7 @@ public class EmployeeController {
     }
 
     @GetMapping("external/service/invoke")
-    public ExternalService callToExternalService() {
+    public Mono<UserDetails> callToExternalService() {
         return employeeCouchbaseService.callToExternalservice();
     }
 }

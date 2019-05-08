@@ -2,14 +2,17 @@ package edu.knoldus.employee.couchbase.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 
 @AllArgsConstructor
-public class ExternalService {
+public class UserDetails {
 
-    String type;
+    int userId;
 
-    Value value;
+    int id;
+
+    String title;
+
+    String body;
 }
