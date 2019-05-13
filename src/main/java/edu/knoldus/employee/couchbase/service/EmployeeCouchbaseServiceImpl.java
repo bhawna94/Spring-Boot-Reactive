@@ -1,6 +1,7 @@
 package edu.knoldus.employee.couchbase.service;
 
 import edu.knoldus.employee.couchbase.exceptions.EmployeeNotFoundById;
+import edu.knoldus.employee.couchbase.facade.ExternalserviceFacade;
 import edu.knoldus.employee.couchbase.model.Employee;
 import edu.knoldus.employee.couchbase.model.UserDetails;
 import edu.knoldus.employee.couchbase.repository.EmployeeRepository;
@@ -16,12 +17,12 @@ import java.util.concurrent.CompletableFuture;
 public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
 
     private EmployeeRepository employeeRepository;
+    private ExternalserviceFacade externalserviceFacade;
 
-    private final WebClient webClient;
-
-    public EmployeeCouchbaseServiceImpl(EmployeeRepository employeeRepository, WebClient.Builder webClientBuilder ) {
+    public EmployeeCouchbaseServiceImpl(EmployeeRepository employeeRepository,
+                                        ExternalserviceFacade externalserviceFacade) {
         this.employeeRepository = employeeRepository;
-        this.webClient = webClientBuilder.baseUrl("https://jsonplaceholder.typicode.com").build();
+        this.externalserviceFacade = externalserviceFacade;
     }
 
     @Override
@@ -57,7 +58,8 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
 
     @Override
     public Mono<UserDetails> callToExternalservice() {
-     return this.webClient.get().uri("posts/1").retrieve().bodyToMono(UserDetails.class);
+
+        return externalserviceFacade.callToExternalservice();
 
     }
 }
