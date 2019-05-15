@@ -8,15 +8,21 @@ import com.couchbase.client.java.query.N1qlQuery;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.knoldus.employee.couchbase.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.couchbase.core.CouchbaseTemplate;
+import reactor.core.publisher.Mono;
 import rx.Observable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class CustomisedEmployeeRepositoryImpl  implements CustomisedEmployeeRepository{
 
     @Autowired
     private Bucket bucket;
+
+    @Autowired
+    private CouchbaseTemplate couchbaseTemplate;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -42,6 +48,7 @@ public class CustomisedEmployeeRepositoryImpl  implements CustomisedEmployeeRepo
         return toCompletableFuture(row).thenApply(this::mapToEmployee);
     }
 
+
     private CompletableFuture<JsonObject> toCompletableFuture(Observable<JsonObject> observable) {
         CompletableFuture<JsonObject> future = new CompletableFuture<>();
         observable.single().subscribe(future::complete, future::completeExceptionally);
@@ -59,5 +66,17 @@ public class CustomisedEmployeeRepositoryImpl  implements CustomisedEmployeeRepo
         }
 
         return emp;
+
     }
+
+    @Override
+    public Mono<List<Employee>> getEmployeeUsingCustomquery(String name) {
+        //these values(META().id, META().cas) are required for mapping the values to key and version fields
+        String statement = "select empName, empId, META().id AS _ID, META().cas AS _CAS from Bucket1 where empName=$empName";
+        JsonObject placeHolder = JsonObject.create().put("empName", name);
+        N1qlQuery n1qlQuery = N1qlQuery.parameterized(statement, placeHolder);
+        return Mono.just(couchbaseTemplate.findByN1QL(n1qlQuery, Employee.class));
+
+    }
+
 }

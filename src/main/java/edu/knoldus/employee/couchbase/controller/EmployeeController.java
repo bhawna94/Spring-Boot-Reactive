@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -34,4 +36,17 @@ public class EmployeeController {
     public Employee addEmployee(@RequestBody Employee employee) {
           return employeeCouchbaseService.addEmployee(employee);
     }
+
+    @GetMapping("employee/get/emp/{id}")
+    public Mono<Employee> getEmployee(@PathVariable String id) {
+        System.out.println(id + "fhds");
+     return employeeCouchbaseService.getEmployee(id);
+    }
+
+    @GetMapping("employee/get/custom/query/{name}")
+    public Mono<List<Employee>> getEmployeeUsingCustomQuery(@PathVariable String name) {
+       return employeeCouchbaseService.getEmployeeUsingCustomQuery(name);
+    }
+
+
 }
