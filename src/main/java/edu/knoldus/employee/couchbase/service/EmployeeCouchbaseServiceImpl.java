@@ -1,6 +1,5 @@
 package edu.knoldus.employee.couchbase.service;
 
-import com.couchbase.client.core.CouchbaseException;
 import edu.knoldus.employee.couchbase.exceptions.EmployeeNotFoundById;
 import edu.knoldus.employee.couchbase.model.Employee;
 import edu.knoldus.employee.couchbase.repository.EmployeeRepository;
@@ -8,7 +7,6 @@ import edu.knoldus.employee.couchbase.repository.reactive.EmployeeReactiveReposi
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -31,7 +29,6 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
     @Override
     public Employee getEmployeeById(String employeeId) {
 
-        System.out.println("hey" + employeeRepository.findById(employeeId));
         return employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundById("Employee with id " + employeeId + " not found")
                 );
@@ -41,13 +38,13 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
     public CompletableFuture<Employee> getEmployeeByIdAndName(String id, String name) {
         return employeeRepository.getByIdAndName(id, name)
                 .thenApply(response -> {
-                    System.out.println("Response" + response);
-                    return response;
+                            System.out.println("Response" + response);
+                            return response;
                         }
                 )
                 .exceptionally(throwable -> {
-                    Throwable cause = throwable.getCause();
-                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, cause.getMessage());
+                            Throwable cause = throwable.getCause();
+                            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, cause.getMessage());
                         }
 
                 );
@@ -65,8 +62,8 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
         return employeeReactiveRepository.findById(id)
                 .switchIfEmpty(Mono.just(Employee.builder().build()))
                 .onErrorMap(throwable -> {
-            throw new RuntimeException(throwable.getCause());
-        });
+                    throw new RuntimeException(throwable.getCause());
+                });
     }
 
     @Override
@@ -75,7 +72,7 @@ public class EmployeeCouchbaseServiceImpl implements EmployeeCouchbaseService {
         return employeeRepository.getEmployeeUsingCustomquery(name)
                 .switchIfEmpty(Mono.just(Collections.singletonList(Employee.builder().build())))
                 .onErrorMap(throwable -> {
-            throw new RuntimeException(throwable.getCause());
-        });
+                    throw new RuntimeException(throwable.getCause());
+                });
     }
 }
